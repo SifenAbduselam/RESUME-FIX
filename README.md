@@ -18,6 +18,10 @@ A React application that analyzes your resume and provides instant feedback on f
 - JavaScript (ES6+)
 - Vite (Build tool)
 
+##Screenshots
+<img width="600" height="407" alt="image" src="https://github.com/user-attachments/assets/1c84e400-8897-4849-88b0-f1f0713b1598" />
+
+
 ## 🌐 Live Demo
 
 https://sifenabduselam.github.io/resume-fix/
