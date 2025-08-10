@@ -5,5 +5,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'docs'
-  }
+  },
+  base: '/resume-fix/'  // This must match your exact repository name
 })
