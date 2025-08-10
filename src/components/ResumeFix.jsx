@@ -9,7 +9,7 @@ const recommendedSectionOrder = [
   "Contact",
 ];
 
-// Helper functions (parseSections, checkBullets, checkDates, etc.) here:
+// Helper functions
 const parseResume = (text) => {
   const lines = text.split("\n").map((line) => line.trim());
   const sections = [];
@@ -32,21 +32,30 @@ const parseDateRanges = (text) => {
   const lines = text.split("\n");
   const ranges = [];
 
-  lines.forEach((line) => {
-    const match = line.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4}\s*-\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Present|Current)?\s*(\d{4})?/i);
+  lines.forEach((line, lineIndex) => {
+    // More precise regex that looks for date ranges on their own lines
+    const match = line.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}\s*-\s*(?:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})|(Present|Current))/i);
     if (match) {
-      const startStr = `${match[1]} 1, ${line.match(/\b\d{4}\b/)?.[0]}`;
-      const startDate = new Date(startStr);
+      try {
+        const startStr = `${match[1]} 1, ${match[0].match(/\b\d{4}\b/)?.[0]}`;
+        const startDate = new Date(startStr);
 
-      let endDate = null;
-      if (match[2] && !/present|current/i.test(match[2])) {
-        const yearMatch = line.match(/-\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4})/i);
-        if (yearMatch) {
-          const endStr = `${match[2]} 1, ${yearMatch[1]}`;
+        let endDate = null;
+        if (match[4] && /present|current/i.test(match[4])) {
+          endDate = new Date(); // Current date
+        } else if (match[2] && match[3]) {
+          const endStr = `${match[2]} 1, ${match[3]}`;
           endDate = new Date(endStr);
         }
+        
+        ranges.push({ 
+          start: startDate, 
+          end: endDate,
+          line: lineIndex + 1
+        });
+      } catch (e) {
+        console.log("Date parsing error:", e);
       }
-      ranges.push({ start: startDate, end: endDate });
     }
   });
 
@@ -65,7 +74,7 @@ const checkDateRanges = (ranges) => {
   for (let i = 0; i < ranges.length - 1; i++) {
     const currentEnd = ranges[i].end;
     const nextStart = ranges[i + 1].start;
-    if (currentEnd && nextStart < currentEnd) {
+    if (currentEnd && nextStart && nextStart < currentEnd) {
       issues.push(`❌ Date range #${i + 2} starts before previous range ends.`);
     }
   }
@@ -76,9 +85,14 @@ const checkDateRanges = (ranges) => {
 const evaluateResume = (text) => {
   const suggestions = [];
 
-  // Bullet points check
-  const hasDotBullets = /•/.test(text);
-  const hasDashBullets = /-\s/.test(text);
+  // Better bullet points check
+  const lines = text.split('\n');
+  const dotBullets = lines.filter(line => line.trim().startsWith('•')).length;
+  const dashBullets = lines.filter(line => line.trim().startsWith('- ')).length;
+
+  const hasDotBullets = dotBullets > 0;
+  const hasDashBullets = dashBullets > 0;
+
   if (!hasDotBullets && !hasDashBullets) {
     suggestions.push("❌ No bullet points found. Use bullet points for clarity.");
   } else if (hasDotBullets && hasDashBullets) {
@@ -86,7 +100,7 @@ const evaluateResume = (text) => {
   }
 
   // Date format and ranges check
-  const dateRegex = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{4}\b/;
+  const dateRegex = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}\b/i;
   if (!dateRegex.test(text)) {
     suggestions.push("❌ Date format inconsistent or missing. Use formats like 'Jan 2023'.");
   }
@@ -106,7 +120,7 @@ const evaluateResume = (text) => {
   for (let i = 0; i < presentSections.length - 1; i++) {
     const currentIdx = recommendedSectionOrder.indexOf(presentSections[i]);
     const nextIdx = recommendedSectionOrder.indexOf(presentSections[i + 1]);
-    if (currentIdx > nextIdx) {
+    if (currentIdx > nextIdx && currentIdx !== -1 && nextIdx !== -1) {
       suggestions.push(`❌ Section "${presentSections[i]}" should come before "${presentSections[i + 1]}".`);
     }
   }
@@ -125,6 +139,21 @@ const evaluateResume = (text) => {
 
   return suggestions;
 };
+
+// Simple fake spell checker - returns list of "misspelled" words
+export function spellCheck(text) {
+  // Example: Just check for some common typos, really basic
+  const commonTypos = ["teh", "recieve", "adress", "langauge"];
+  const foundTypos = [];
+
+  commonTypos.forEach((word) => {
+    if (text.toLowerCase().includes(word)) {
+      foundTypos.push(word);
+    }
+  });
+
+  return foundTypos;
+}
 
 const ResumeFix = () => {
   const [resumeText, setResumeText] = useState("");
