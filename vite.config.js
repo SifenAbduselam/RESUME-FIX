@@ -6,5 +6,5 @@ export default defineConfig({
   build: {
     outDir: 'docs'
   },
-  base: '/resume-fix/'
+  base: '/RESUME-FIX/'
 })
