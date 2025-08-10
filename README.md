@@ -20,7 +20,7 @@ A React application that analyzes your resume and provides instant feedback on f
 
 ## 🌐 Live Demo
 
-[https://sifenabduselam.github.io/resume-fix/](https://sifenabduselam.github.io/resume-fix/)
+https://sifenabduselam.github.io/resume-fix/
 
 ## 📦 Installation
 
