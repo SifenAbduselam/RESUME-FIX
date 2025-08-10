@@ -22,6 +22,10 @@ A React application that analyzes your resume and provides instant feedback on f
 
 https://sifenabduselam.github.io/resume-fix/
 
+## Built by Sifen Abduselam
+🔗 [LinkedIn](https://www.linkedin.com/in/sifen-abduselam-a52798373/
+) | 🌐 [GitHub](https://github.com/sifenabduselam)
+
 ## 📦 Installation
 
 ```bash
