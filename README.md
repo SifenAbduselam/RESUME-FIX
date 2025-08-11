@@ -33,7 +33,7 @@ https://sifenabduselam.github.io/resume-fix/
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/sifenabduselam/resume-fix.git
-cd resume-fix
+git clone https://github.com/sifenabduselam/PORTFOLIO.git
+cd PORTFOLIO
 npm install
 npm run dev
